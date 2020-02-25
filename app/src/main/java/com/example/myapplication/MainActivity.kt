@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.TextView
@@ -14,6 +15,9 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
+import okhttp3.*
+import okio.IOException
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,9 +27,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var detector: BarcodeDetector
     private lateinit var cameraSource: CameraSource
 
+    private lateinit var dataUrl: URL
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        fetchJson()
 
         svBarcode = findViewById(R.id.svBarcode)
         tvBarcode = findViewById(R.id.tvBarcode)
@@ -73,6 +81,28 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.CAMERA), 123)
             }
         })
+    }
+
+    private fun fetchJson() {
+        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object: Callback {
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+                Log.d("dbg", "$body")
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("dbg", "Failed to execute request")
+            }
+
+
+        })
+
+
     }
 
     override fun onRequestPermissionsResult(
