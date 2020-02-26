@@ -20,6 +20,14 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
+import com.google.gson.GsonBuilder
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import okhttp3.*
+import okio.IOException
+import java.net.URL
 import com.google.ar.core.Anchor
 import com.google.ar.core.HitResult
 import com.google.ar.core.Plane
@@ -30,17 +38,36 @@ import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import kotlinx.android.synthetic.main.ar_fragment.*
 
+
+@JsonClass(generateAdapter = true)
+    data class Products(val data: List<Product>)
+@JsonClass(generateAdapter = true)
+    data class Product(
+        val id: Int,
+        val name: String,
+        val item: String,
+        val description: String,
+        val inventory: Int,
+        val url: String,
+        val tags: List<String>
+    )
+
 class MainActivity : AppCompatActivity() {
 
     var arFragment: ArFragment? = null
     var isFragmentLoaded = false
     val fragManager = supportFragmentManager
 
+
     private lateinit var svBarcode: SurfaceView
     private lateinit var tvBarcode: TextView
 
     private lateinit var detector: BarcodeDetector
     private lateinit var cameraSource: CameraSource
+
+    private var globalResult: String? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +86,9 @@ class MainActivity : AppCompatActivity() {
         }*/
     }
 
+        fetchJson()
     fun qrScanner() {
+
         svBarcode = findViewById(R.id.svBarcode)
         tvBarcode = findViewById(R.id.tvBarcode)
 
@@ -119,6 +148,61 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+
+//    private fun fetchJson() {
+////        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+////        val request = Request.Builder().url(url).build()
+////
+////        val client = OkHttpClient()
+////        client.newCall(request).enqueue(object: Callback {
+////
+////            override fun onResponse(call: Call, response: Response) {
+////                var body = response.body?.string()
+////
+////                val moshi: Moshi = Moshi.Builder().build()
+////                val adapter: JsonAdapter<Products> = moshi.adapter(Products::class.java)
+////                val products = adapter.fromJson(body)
+////
+////                Log.d("dbg", " hees ${products}")
+////
+////            }
+////
+////            override fun onFailure(call: Call, e: IOException) {
+////                Log.d("dbg", "Failed to execute request")
+////            }
+////
+////
+////        })
+////
+////
+////    }
+
+    private fun fetchJson() {
+        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+
+        val request = Request.Builder().url(url).build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string()
+
+                val gson = GsonBuilder().create()
+                val products = gson.fromJson(body, Products::class.java)
+
+                val data = products.data
+
+                for (product in data) {
+                    Log.d("dbg", "${product.name}")
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                println("Failed")
+            }
+        })
 
     private fun placeObject(fragment: ArFragment, anchor: Anchor) {
         ViewRenderable.builder()
@@ -204,4 +288,8 @@ class MainActivity : AppCompatActivity() {
         cameraSource.release()
     }
 
+
+
 }
+
+
