@@ -15,11 +15,33 @@ import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
+import com.google.gson.GsonBuilder
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
 import okhttp3.*
 import okio.IOException
 import java.net.URL
 
+
+@JsonClass(generateAdapter = true)
+    data class Products(val data: List<Product>)
+@JsonClass(generateAdapter = true)
+    data class Product(
+        val id: Int,
+        val name: String,
+        val item: String,
+        val description: String,
+        val inventory: Int,
+        val url: String,
+        val tags: List<String>
+    )
+
+
 class MainActivity : AppCompatActivity() {
+
+
 
     private lateinit var svBarcode: SurfaceView
     private lateinit var tvBarcode: TextView
@@ -27,7 +49,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var detector: BarcodeDetector
     private lateinit var cameraSource: CameraSource
 
-    private lateinit var dataUrl: URL
+    private var globalResult: String? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,26 +107,59 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+//    private fun fetchJson() {
+////        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+////        val request = Request.Builder().url(url).build()
+////
+////        val client = OkHttpClient()
+////        client.newCall(request).enqueue(object: Callback {
+////
+////            override fun onResponse(call: Call, response: Response) {
+////                var body = response.body?.string()
+////
+////                val moshi: Moshi = Moshi.Builder().build()
+////                val adapter: JsonAdapter<Products> = moshi.adapter(Products::class.java)
+////                val products = adapter.fromJson(body)
+////
+////                Log.d("dbg", " hees ${products}")
+////
+////            }
+////
+////            override fun onFailure(call: Call, e: IOException) {
+////                Log.d("dbg", "Failed to execute request")
+////            }
+////
+////
+////        })
+////
+////
+////    }
+
     private fun fetchJson() {
         val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+
         val request = Request.Builder().url(url).build()
 
         val client = OkHttpClient()
-        client.newCall(request).enqueue(object: Callback {
+        client.newCall(request).enqueue(object : Callback {
 
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string()
-                Log.d("dbg", "$body")
+
+                val gson = GsonBuilder().create()
+                val products = gson.fromJson(body, Products::class.java)
+
+                val data = products.data
+
+                for (product in data) {
+                    Log.d("dbg", "${product.name}")
+                }
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                Log.d("dbg", "Failed to execute request")
+                println("Failed")
             }
-
-
         })
-
-
     }
 
     override fun onRequestPermissionsResult(
@@ -126,4 +183,8 @@ class MainActivity : AppCompatActivity() {
         cameraSource.release()
     }
 
+
+
 }
+
+
