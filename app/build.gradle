@@ -11,11 +11,15 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.example.myapplication"
-        minSdkVersion 22
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
     buildTypes {
         release {
@@ -23,6 +27,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
@@ -35,6 +40,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.4.0'
     implementation 'com.squareup.moshi:moshi:1.8.0'
     kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.8.0'
+    implementation 'com.google.ar:core:1.11.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.11.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
