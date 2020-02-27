@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         qrScanner()
-
+        fetchJson()
 
         /** MARK: AR-creation
         arFragment = sceneform_fragment as ArFragment
@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         }*/
     }
 
-        fetchJson()
     fun qrScanner() {
 
         svBarcode = findViewById(R.id.svBarcode)
@@ -203,6 +202,7 @@ class MainActivity : AppCompatActivity() {
                 println("Failed")
             }
         })
+    }
 
     private fun placeObject(fragment: ArFragment, anchor: Anchor) {
         ViewRenderable.builder()
@@ -242,6 +242,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 }.start()
     }
+
     fun showFragment() {
         Log.d("dbg", "showfragment() started")
         val transaction = fragManager.beginTransaction()
