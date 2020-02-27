@@ -8,10 +8,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -21,10 +19,6 @@ import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.gson.GsonBuilder
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.JsonClass
-import com.squareup.moshi.Moshi
 import okhttp3.*
 import okio.IOException
 import java.net.URL
@@ -39,9 +33,7 @@ import com.google.ar.sceneform.ux.TransformableNode
 import kotlinx.android.synthetic.main.ar_fragment.*
 
 
-@JsonClass(generateAdapter = true)
     data class Products(val data: List<Product>)
-@JsonClass(generateAdapter = true)
     data class Product(
         val id: Int,
         val name: String,
@@ -65,15 +57,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var detector: BarcodeDetector
     private lateinit var cameraSource: CameraSource
 
-    private var globalResult: String? = null
-
+    private var fitToScanImageView: ImageView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         qrScanner()
-        fetchJson()
+
+        fitToScanImageView = findViewById(R.id.fit_to_scan_img)
+
 
         /** MARK: AR-creation
         arFragment = sceneform_fragment as ArFragment
@@ -104,10 +97,11 @@ class MainActivity : AppCompatActivity() {
                         Log.d("dbg", text)
                         Toast.makeText(this@MainActivity, text, Toast.LENGTH_SHORT)
                             .show()
+                        fetchJson()
                         if (!isFragmentLoaded) {
                             Log.d("dbg", "showfragment")
                             showFragment()
-
+                            fitToScanImageView!!.visibility = View.GONE
                         }
 
 
@@ -147,35 +141,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
-
-//    private fun fetchJson() {
-////        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
-////        val request = Request.Builder().url(url).build()
-////
-////        val client = OkHttpClient()
-////        client.newCall(request).enqueue(object: Callback {
-////
-////            override fun onResponse(call: Call, response: Response) {
-////                var body = response.body?.string()
-////
-////                val moshi: Moshi = Moshi.Builder().build()
-////                val adapter: JsonAdapter<Products> = moshi.adapter(Products::class.java)
-////                val products = adapter.fromJson(body)
-////
-////                Log.d("dbg", " hees ${products}")
-////
-////            }
-////
-////            override fun onFailure(call: Call, e: IOException) {
-////                Log.d("dbg", "Failed to execute request")
-////            }
-////
-////
-////        })
-////
-////
-////    }
 
     private fun fetchJson() {
         val url = "http://users.metropolia.fi/~tuomamp/arData.json"

@@ -12,6 +12,15 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
+    <ImageView
+        android:id="@+id/fit_to_scan_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:scaleType="fitCenter"
+        android:src="@drawable/fit_to_scan"
+        android:contentDescription="Scan Stuff" />
+
     <TextView
         android:id="@+id/tvBarcode"
         android:layout_width="match_parent"
