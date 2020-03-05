@@ -27,6 +27,7 @@ class AugmentedImageFragment: ArFragment() {
     override fun getSessionConfiguration(session: Session?): Config {
         val config = super.getSessionConfiguration(session)
         setupAugmentedImageDatabase(config, session)
+        config.setFocusMode(Config.FocusMode.AUTO)
         return config
     }
 
@@ -37,7 +38,7 @@ class AugmentedImageFragment: ArFragment() {
         val augmentedImageBitmap1 = BitmapFactory.decodeStream(inputStream1)
         val inputStream2 = assetManager?.open("paperboy.jpg")
         val augmentedImageBitmap2 = BitmapFactory.decodeStream(inputStream2)
-        augmentedImageDb.addImage("karhuSneaker", augmentedImageBitmap1)
+        augmentedImageDb.addImage("default", augmentedImageBitmap1)
         augmentedImageDb.addImage("paperboy", augmentedImageBitmap2)
         config.augmentedImageDatabase = augmentedImageDb
     }

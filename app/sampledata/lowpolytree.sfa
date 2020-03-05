@@ -62,7 +62,7 @@
     file: 'sampledata/lowpolytree.obj',
     name: 'lowpolytree',
     recenter: 'root',
-    scale: 0.43934800000000002,
+    scale: 0.000043934800000000002,
   },
   version: '0.54:2',
 }

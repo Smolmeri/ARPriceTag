@@ -33,8 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragment: ArFragment
 
     private var fitToScanImageView: ImageView? = null
-    private lateinit var karhuRenderable: ModelRenderable
-
+    private var karhuRenderable: ModelRenderable? = null
 
     private lateinit var cameraSource: Camera
     
@@ -47,9 +46,9 @@ class MainActivity : AppCompatActivity() {
 
 
         val karhu = ModelRenderable.builder()
-            .setSource(this, Uri.parse("igloo.sfb"))
+            .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
             .build()
-        karhu.thenAccept { it -> karhuRenderable = it }
+        karhu.thenAccept { karhuRenderable = it }
 //
 //        val andy = ModelRenderable.builder()
 //            .setSource(this, Uri.parse("andy.sfb"))
@@ -68,6 +67,7 @@ class MainActivity : AppCompatActivity() {
             }
             val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
             updatedAugmentedImages.forEach {
+                Log.d("dbg", "${arFrame.camera.trackingState}")
                 when(it.trackingState) {
                     TrackingState.PAUSED -> {
                         val text = "Detected Image: " + it.name + " - need more info"
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                             anchorNode.setParent(fragment.arSceneView.scene)
                             val imgNode = TransformableNode(fragment.transformationSystem)
                             imgNode.setParent(anchorNode)
-                            if (it.name == "color") {
+                            if (it.name == "default") {
                                 imgNode.renderable = karhuRenderable
                             }
                         }

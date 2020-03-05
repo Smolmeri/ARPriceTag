@@ -39,9 +39,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.4.0'
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.8.0'
     implementation 'com.google.ar:core:1.11.0'
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.11.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.13.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
@@ -54,3 +53,8 @@ sceneform.asset('sampledata/lowpolytree.obj',
         'default',
         'sampledata/lowpolytree.sfa',
         'src/main/assets/lowpolytree')
+
+sceneform.asset('sampledata/10700_Sneaker_v201.obj',
+        'default',
+        'sampledata/10700_Sneaker_v201.sfa',
+        'src/main/assets/10700_Sneaker_v201')
