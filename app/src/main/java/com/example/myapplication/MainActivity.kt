@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
             frameUpdate()
         }
     }
-    
+
         private fun frameUpdate() {
             val arFrame = fragment.arSceneView.arFrame
             if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
