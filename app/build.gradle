@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.ar.sceneform.plugin'
 
 android {
     compileSdkVersion 29
@@ -38,12 +39,37 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.google.android.gms:play-services-vision:19.0.0'
     implementation 'com.squareup.okhttp3:okhttp:4.4.0'
-    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.8.0'
     implementation 'com.google.ar:core:1.11.0'
-    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.11.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.13.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.google.code.gson:gson:2.8.6'
 
 }
+
+
+sceneform.asset('sampledata/lowpolytree.obj',
+        'default',
+        'sampledata/lowpolytree.sfa',
+        'src/main/assets/lowpolytree')
+
+sceneform.asset('sampledata/10700_Sneaker_v201.obj',
+        'default',
+        'sampledata/10700_Sneaker_v201.sfa',
+        'src/main/assets/10700_Sneaker_v201')
+
+sceneform.asset('sampledata/12308_boots_v2_l2.obj',
+        'default',
+        'sampledata/12308_boots_v2_l2.sfa',
+        'src/main/assets/12308_boots_v2_l2')
+
+sceneform.asset('sampledata/11687_hat_v1_L3.obj',
+        'default',
+        'sampledata/11687_hat_v1_L3.sfa',
+        'src/main/assets/11687_hat_v1_L3')
+
+sceneform.asset('sampledata/Iphone seceond version finished.obj',
+        'default',
+        'sampledata/Iphone seceond version finished.sfa',
+        'src/main/assets/Iphone seceond version finished')

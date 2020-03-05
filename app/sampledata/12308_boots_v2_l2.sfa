@@ -1,0 +1,191 @@
+{
+  materials: [
+    {
+      name: 'Boots_gray',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.52159999999999995,
+            0.52159999999999995,
+            0.52159999999999995,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.37796400000000002,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Boots_pink_plastic',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.97250000000000003,
+            0.57250000000000001,
+            0.63919999999999999,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.37796400000000002,
+        },
+        {
+          opacity: 0.80000000000000004,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Boots_aluminium',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.59999999999999998,
+            0.59999999999999998,
+            0.59999999999999998,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.342997,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Boots_aluminium_red',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.65100000000000002,
+            0.078399999999999997,
+            0.18429999999999999,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.342997,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Boots_pink_body',
+      parameters: [
+        {
+          baseColor: 'boots_body',
+        },
+        {
+          baseColorTint: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.37796400000000002,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Boots_zip',
+      parameters: [
+        {
+          baseColor: 'boots_zip',
+        },
+        {
+          baseColorTint: [
+            1,
+            1,
+            1,
+            1,
+          ],
+        },
+        {
+          metallic: 1,
+        },
+        {
+          roughness: 0.37796400000000002,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/12308_boots_v2_l2.obj',
+    name: '12308_boots_v2_l2',
+    recenter: 'root',
+    scale: 0.339397,
+  },
+  samplers: [
+    {
+      file: 'sampledata/boots_zip.jpg',
+      name: 'boots_zip',
+      params: {
+        usage_type: 'Data',
+      },
+      pipeline_name: 'boots_zip.jpg',
+    },
+    {
+      file: 'sampledata/boots_body.jpg',
+      name: 'boots_body',
+      params: {
+        usage_type: 'Data',
+      },
+      pipeline_name: 'boots_body.jpg',
+    },
+  ],
+  version: '0.54:2',
+}

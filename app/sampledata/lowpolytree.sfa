@@ -1,0 +1,68 @@
+{
+  materials: [
+    {
+      name: 'Bark',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.176206,
+            0.051816000000000001,
+            0.016055,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 0.14280000000000001,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+    {
+      name: 'Leaves',
+      parameters: [
+        {
+          baseColor: null,
+        },
+        {
+          baseColorTint: [
+            0.029850000000000002,
+            0.106291,
+            0.017666000000000001,
+            1,
+          ],
+        },
+        {
+          metallic: 0,
+        },
+        {
+          roughness: 0.14280000000000001,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/obj_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'Orientation',
+    ],
+    collision: {},
+    file: 'sampledata/lowpolytree.obj',
+    name: 'lowpolytree',
+    recenter: 'root',
+    scale: 0.000043934800000000002,
+  },
+  version: '0.54:2',
+}
