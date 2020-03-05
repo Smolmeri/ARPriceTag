@@ -5,6 +5,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.ar.sceneform.plugin'
 
 android {
     compileSdkVersion 29
@@ -47,3 +48,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
 }
+
+
+sceneform.asset('sampledata/lowpolytree.obj',
+        'default',
+        'sampledata/lowpolytree.sfa',
+        'src/main/assets/lowpolytree')
