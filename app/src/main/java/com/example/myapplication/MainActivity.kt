@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.math.Quaternion
+import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
@@ -33,27 +35,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragment: ArFragment
 
     private var fitToScanImageView: ImageView? = null
-    private var karhuRenderable: ModelRenderable? = null
+    private var sneakerRenderable: ModelRenderable? = null
+    private var hardHatRenderable: ModelRenderable? = null
+    private var skiBootRenderable: ModelRenderable? = null
 
-    private lateinit var cameraSource: Camera
-    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
+        showDialog()
 
 
 
-        val karhu = ModelRenderable.builder()
+        val sneaker = ModelRenderable.builder()
             .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
             .build()
-        karhu.thenAccept { karhuRenderable = it }
-//
-//        val andy = ModelRenderable.builder()
-//            .setSource(this, Uri.parse("andy.sfb"))
-//            .build()
-//        andy.thenAccept {it -> andyRenderable = it }
+        sneaker.thenAccept { sneakerRenderable = it }
+
+        val hardHat = ModelRenderable.builder()
+                .setSource(this, Uri.parse("11687_hat_v1_L3.sfb"))
+                .build()
+        hardHat.thenAccept { hardHatRenderable = it }
+
+        val skiBoot = ModelRenderable.builder()
+                .setSource(this, Uri.parse("12308_boots_v2_l2.sfb"))
+                .build()
+        skiBoot.thenAccept { skiBootRenderable = it }
+
+
 
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
@@ -84,8 +94,13 @@ class MainActivity : AppCompatActivity() {
                             anchorNode.setParent(fragment.arSceneView.scene)
                             val imgNode = TransformableNode(fragment.transformationSystem)
                             imgNode.setParent(anchorNode)
-                            if (it.name == "default") {
-                                imgNode.renderable = karhuRenderable
+                            imgNode.setLocalRotation(
+                                    Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f)
+                            )
+                            when {
+                                it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
+                                it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
+                                it.name == "skiboot" -> imgNode.renderable = skiBootRenderable
                             }
                         }
                     }
@@ -96,7 +111,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
+    private fun showDialog() {
+        val dialogFragment = FullScreenFragment()
+        dialogFragment.show(supportFragmentManager, "signature")
+    }
 
     private fun fetchJson() {
         val url = "http://users.metropolia.fi/~tuomamp/arData.json"

@@ -167,7 +167,7 @@
     file: 'sampledata/12308_boots_v2_l2.obj',
     name: '12308_boots_v2_l2',
     recenter: 'root',
-    scale: 0.339397,
+    scale: 0.05,
   },
   samplers: [
     {
