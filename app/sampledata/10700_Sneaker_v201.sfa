@@ -37,7 +37,7 @@
     file: 'sampledata/10700_Sneaker_v201.obj',
     name: '10700_Sneaker_v201',
     recenter: 'root',
-    scale: 0.052509,
+    scale: 0.005,
   },
   version: '0.54:2',
 }

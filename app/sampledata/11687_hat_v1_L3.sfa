@@ -37,7 +37,7 @@
     file: 'sampledata/11687_hat_v1_L3.obj',
     name: '11687_hat_v1_L3',
     recenter: 'root',
-    scale: 0.094389000000000001,
+    scale: 0.005,
   },
   samplers: [
     {

@@ -34,12 +34,25 @@ class AugmentedImageFragment: ArFragment() {
     private fun setupAugmentedImageDatabase(config: Config, session: Session?) {
         val augmentedImageDb = AugmentedImageDatabase(session)
         val assetManager = context?.assets
-        val inputStream1 = assetManager?.open("default.jpg")
+
+        val inputStream1 = assetManager?.open("karhuSneaker.jpg")
         val augmentedImageBitmap1 = BitmapFactory.decodeStream(inputStream1)
+
         val inputStream2 = assetManager?.open("paperboy.jpg")
         val augmentedImageBitmap2 = BitmapFactory.decodeStream(inputStream2)
-        augmentedImageDb.addImage("default", augmentedImageBitmap1)
+
+        val inputStream3 = assetManager?.open("hardhat.jpg")
+        val augmentedImageBitmap3 = BitmapFactory.decodeStream(inputStream3)
+
+        val inputStream4 = assetManager?.open("skiboot.png")
+        val augmentedImageBitmap4 = BitmapFactory.decodeStream(inputStream4)
+
+
+        augmentedImageDb.addImage("karhuSneaker", augmentedImageBitmap1)
         augmentedImageDb.addImage("paperboy", augmentedImageBitmap2)
+        augmentedImageDb.addImage("hardhat", augmentedImageBitmap3)
+        augmentedImageDb.addImage("skiboot", augmentedImageBitmap4)
+
         config.augmentedImageDatabase = augmentedImageDb
     }
 }
