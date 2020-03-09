@@ -3,8 +3,10 @@ package com.example.myapplication
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.*
@@ -12,9 +14,11 @@ import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
+import com.google.ar.sceneform.rendering.ViewRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import com.google.gson.GsonBuilder
+import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.*
 import okio.IOException
 
@@ -38,6 +42,8 @@ class MainActivity : AppCompatActivity() {
     private var sneakerRenderable: ModelRenderable? = null
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
+    private lateinit var productNameRenderable: ViewRenderable
+    private  var globalData: List<Product>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
         showDialog()
+        fetchJson()
 
 
 
@@ -63,6 +70,17 @@ class MainActivity : AppCompatActivity() {
                 .build()
         skiBoot.thenAccept { skiBootRenderable = it }
 
+        val inflater:LayoutInflater = LayoutInflater.from(applicationContext)
+        val view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
+//        val textView : TextView = view?.findViewById(R.id.basicInfoCard) as TextView
+//
+//        textView.text = globalData!![0].name
+
+
+        ViewRenderable.builder()
+            .setView(this, view)
+            .build()
+            .thenAccept { renderable -> productNameRenderable = renderable }
 
 
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
@@ -93,10 +111,16 @@ class MainActivity : AppCompatActivity() {
                             val anchorNode = AnchorNode(anchor)
                             anchorNode.setParent(fragment.arSceneView.scene)
                             val imgNode = TransformableNode(fragment.transformationSystem)
+                            val textNode = TransformableNode(fragment.transformationSystem)
+
                             imgNode.setParent(anchorNode)
                             imgNode.setLocalRotation(
                                     Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f)
                             )
+                            textNode.setParent(imgNode)
+                            textNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f) )
+                            textNode.renderable = productNameRenderable
+
                             when {
                                 it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
                                 it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
@@ -132,9 +156,7 @@ class MainActivity : AppCompatActivity() {
 
                 val data = products.data
 
-                for (product in data) {
-                    Log.d("dbg", "${product.name}")
-                }
+                globalData = data
             }
 
             override fun onFailure(call: Call, e: IOException) {
