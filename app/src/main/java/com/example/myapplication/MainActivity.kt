@@ -1,10 +1,12 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -19,8 +21,11 @@ import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.price_tag.*
 import okhttp3.*
 import okio.IOException
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 data class Products(val data: List<Product>)
@@ -36,6 +41,8 @@ data class Products(val data: List<Product>)
 
 class MainActivity : AppCompatActivity() {
 
+
+    var arrayList_details:ArrayList<Model> = ArrayList()
     private lateinit var fragment: ArFragment
 
     private var fitToScanImageView: ImageView? = null
@@ -43,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
-    private  var globalData: List<Product>? = null
+    private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +58,9 @@ class MainActivity : AppCompatActivity() {
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
         showDialog()
-        fetchJson()
+
+        run(url)
+
 
 
 
@@ -59,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
             .build()
         sneaker.thenAccept { sneakerRenderable = it }
+
 
         val hardHat = ModelRenderable.builder()
                 .setSource(this, Uri.parse("11687_hat_v1_L3.sfb"))
@@ -72,9 +82,13 @@ class MainActivity : AppCompatActivity() {
 
         val inflater:LayoutInflater = LayoutInflater.from(applicationContext)
         val view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
-//        val textView : TextView = view?.findViewById(R.id.basicInfoCard) as TextView
-//
-//        textView.text = globalData!![0].name
+
+        //val textView: TextView = view?.findViewById(R.id.basicInfoCard) as TextView
+        //textView.text = "arrayList_details[0].name"
+
+        //Log.d("dbg", "oncreate ${arrayList_details[0].name}")
+
+
 
 
         ViewRenderable.builder()
@@ -86,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
         }
+
     }
 
         private fun frameUpdate() {
@@ -140,30 +155,70 @@ class MainActivity : AppCompatActivity() {
         dialogFragment.show(supportFragmentManager, "signature")
     }
 
-    private fun fetchJson() {
-        val url = "http://users.metropolia.fi/~tuomamp/arData.json"
 
-        val request = Request.Builder().url(url).build()
 
+    fun run(url: String) {
+        Log.d("dbg", "fetch started")
+        val request = Request.Builder()
+            .url(url)
+            .build()
         val client = OkHttpClient()
         client.newCall(request).enqueue(object : Callback {
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string()
-
-                val gson = GsonBuilder().create()
-                val products = gson.fromJson(body, Products::class.java)
-
-                val data = products.data
-
-                globalData = data
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("dbg", "$e")
             }
 
-            override fun onFailure(call: Call, e: IOException) {
-                println("Failed")
+            override fun onResponse(call: Call, response: Response) {
+                Log.d("dbg", "onResponse")
+                val str_response = response.body!!.string()
+                //creating json object
+                val json_contact:JSONObject = JSONObject(str_response)
+                Log.d("dbg", "json_contact $json_contact")
+                //creating json array
+                Log.d("dbg", "creating json array")
+                val jsonarrayInfo: JSONArray = json_contact.getJSONArray("data")
+                Log.d("dbg", "json array ok")
+                var i:Int = 0
+                val size:Int = jsonarrayInfo.length()
+                Log.d("dbg", "creating arraylist")
+                arrayList_details= ArrayList()
+                Log.d("dbg", "created arraylist")
+
+                for (i in 0.. size-1) {
+                    Log.d("dbg", "for loop $i")
+                    val jsonObjectdetail:JSONObject=jsonarrayInfo.getJSONObject(i)
+                    val model:Model= Model();
+                    model.id=jsonObjectdetail.getString("id")
+                    model.name=jsonObjectdetail.getString("name")
+                    model.item=jsonObjectdetail.getString("item")
+                    model.item=jsonObjectdetail.getString("description")
+                    model.inventory=jsonObjectdetail.getString("inventory")
+                    model.url=jsonObjectdetail.getString("url")
+                    model.tags=jsonObjectdetail.getString("tags")
+
+                    arrayList_details.add(model)
+                    Log.d("model", "$model")
+                }
+
+                runOnUiThread {
+                    //stuff that updates ui
+                    //val obj_adapter : CustomAdapter
+                    //obj_adapter = CustomAdapter(applicationContext,arrayList_details)
+                    //listView_details.adapter=obj_adapter
+                    Log.d("json", "$arrayList_details")
+
+                    Log.d("model", arrayList_details[0].name)
+
+                }
+
             }
         })
     }
+
+
+
+
+
 
 
 }
