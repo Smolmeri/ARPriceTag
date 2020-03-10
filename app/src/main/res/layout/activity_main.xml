@@ -20,6 +20,13 @@
         android:src="@drawable/fit_to_scan"
         android:contentDescription="hees" />
 
-    </FrameLayout>
+    <TextView
+        android:id="@+id/textView123"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:background="@color/primaryLightColor"/>
+
+</FrameLayout>
 
 

@@ -1,8 +1,12 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,36 +25,54 @@ import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.layout_full_screen_dialog.*
 import kotlinx.android.synthetic.main.price_tag.*
+import kotlinx.android.synthetic.main.price_tag.view.*
 import okhttp3.*
 import okio.IOException
 import org.json.JSONArray
 import org.json.JSONObject
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.uiThread
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 
 data class Products(val data: List<Product>)
-    data class Product(
-        val id: Int,
-        val name: String,
-        val item: String,
-        val description: String,
-        val inventory: Int,
-        val url: String,
-        val tags: List<String>
-    )
+data class Product(
+    val id: Int,
+    val name: String,
+    val item: String,
+    val description: String,
+    val inventory: Int,
+    val url: String,
+    val tags: List<String>
+)
 
+//@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
 
-    var arrayList_details:ArrayList<Model> = ArrayList()
+    var arrayList_details: ArrayList<Model> = ArrayList()
     private lateinit var fragment: ArFragment
 
+    private var testeri = "moi"
     private var fitToScanImageView: ImageView? = null
     private var sneakerRenderable: ModelRenderable? = null
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
+    private var modelIndex = 4
+    lateinit var view: View
+
+    private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
+
+    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +81,9 @@ class MainActivity : AppCompatActivity() {
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
         showDialog()
 
-        run(url)
+
+
+
 
 
 
@@ -70,25 +94,31 @@ class MainActivity : AppCompatActivity() {
         sneaker.thenAccept { sneakerRenderable = it }
 
 
+
+
         val hardHat = ModelRenderable.builder()
-                .setSource(this, Uri.parse("11687_hat_v1_L3.sfb"))
-                .build()
+            .setSource(this, Uri.parse("11687_hat_v1_L3.sfb"))
+            .build()
         hardHat.thenAccept { hardHatRenderable = it }
 
         val skiBoot = ModelRenderable.builder()
-                .setSource(this, Uri.parse("12308_boots_v2_l2.sfb"))
-                .build()
+            .setSource(this, Uri.parse("12308_boots_v2_l2.sfb"))
+            .build()
         skiBoot.thenAccept { skiBootRenderable = it }
 
-        val inflater:LayoutInflater = LayoutInflater.from(applicationContext)
-        val view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
 
-        //val textView: TextView = view?.findViewById(R.id.basicInfoCard) as TextView
+        //inflate()
+        val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
+        view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
+
+        //toimii
+        //view.basicInfoCard.text = "moroo"
+
+
+        val textView: TextView = view?.findViewById(R.id.basicInfoCard) as TextView
         //textView.text = "arrayList_details[0].name"
 
         //Log.d("dbg", "oncreate ${arrayList_details[0].name}")
-
-
 
 
         ViewRenderable.builder()
@@ -100,61 +130,99 @@ class MainActivity : AppCompatActivity() {
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
         }
+        //test network
+                if (networkOk()) {
+                    doAsync{
+                        run(url)
+                        uiThread {
+                            //textView2.text = "moi"
+                            Log.d("dbg", "asyncUIThread modelindex $modelIndex")
+                            textView123.text = arrayList_details[0].name
+                            view.basicInfoCard.text = arrayList_details[modelIndex].name
+                        }
+
+                    }
+                }
 
     }
 
-        private fun frameUpdate() {
-            val arFrame = fragment.arSceneView.arFrame
-            if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
-                return
-            }
-            val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
-            updatedAugmentedImages.forEach {
-                Log.d("dbg", "${arFrame.camera.trackingState}")
-                when(it.trackingState) {
-                    TrackingState.PAUSED -> {
-                        val text = "Detected Image: " + it.name + " - need more info"
-                        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-                    }
-                    TrackingState.TRACKING -> {
-                        Log.d("dbg", "hees")
-                        var anchors = it.anchors
-                        if( anchors.isEmpty() ) {
-                            fitToScanImageView?.visibility = View.GONE
-                            val pose = it.centerPose
-                            val anchor = it.createAnchor(pose)
-                            val anchorNode = AnchorNode(anchor)
-                            anchorNode.setParent(fragment.arSceneView.scene)
-                            val imgNode = TransformableNode(fragment.transformationSystem)
-                            val textNode = TransformableNode(fragment.transformationSystem)
+    private fun inflate(i: Int) {
+        val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
+        view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
+        modelIndex = i
+        Log.d("dbg", "inflate modelIndex $modelIndex")
+        Log.d("dbg", "view!! ${view.id}")
+        view.basicInfoCard.text = arrayList_details[modelIndex].name
 
-                            imgNode.setParent(anchorNode)
-                            imgNode.setLocalRotation(
-                                    Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f)
-                            )
-                            textNode.setParent(imgNode)
-                            textNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f) )
-                            textNode.renderable = productNameRenderable
+        //testing textview in the corner
+        textView123.text = arrayList_details[modelIndex].name
+    }
 
-                            when {
-                                it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
-                                it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
-                                it.name == "skiboot" -> imgNode.renderable = skiBootRenderable
-                            }
+    private fun frameUpdate() {
+        val arFrame = fragment.arSceneView.arFrame
+        if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
+            return
+        }
+        val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
+        updatedAugmentedImages.forEach {
+            Log.d("tracking", "${arFrame.camera.trackingState}")
+            when (it.trackingState) {
+                TrackingState.PAUSED -> {
+                    val text = "Detected Image: " + it.name + " - need more info"
+                    Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+                    textView123.text = text
+
+                }
+                TrackingState.TRACKING -> {
+                    Log.d("tracking", "hees")
+                    var anchors = it.anchors
+                    if (anchors.isEmpty()) {
+                        fitToScanImageView?.visibility = View.GONE
+                        val pose = it.centerPose
+                        val anchor = it.createAnchor(pose)
+                        val anchorNode = AnchorNode(anchor)
+                        anchorNode.setParent(fragment.arSceneView.scene)
+                        val imgNode = TransformableNode(fragment.transformationSystem)
+                        val textNode = TransformableNode(fragment.transformationSystem)
+
+                        imgNode.setParent(anchorNode)
+                        imgNode.setLocalRotation(
+                            Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f)
+                        )
+                        textNode.setParent(imgNode)
+                        textNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                        textNode.renderable = productNameRenderable
+
+                        when {
+                            it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
+                            it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
+                            it.name == "skiboot" -> imgNode.renderable = skiBootRenderable
                         }
+                        if (it.name == "karhuSneaker") {
+                            Log.d("dbg", "olen karhu")
+                            inflate(1)
+                            Log.d("dbg", "modelIndex $modelIndex")
+                        }
+                        if (it.name == "skiboot") {
+                            Log.d("dbg", "olen mono")
+                            inflate(3)
+                            Log.d("dbg", "modelIndex $modelIndex")
+                        }
+
                     }
-                        TrackingState.STOPPED -> {
+                }
+                TrackingState.STOPPED -> {
                     val text = "Tracking stopped: " + it.name
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
                 }
-                }
             }
         }
+    }
+
     private fun showDialog() {
         val dialogFragment = FullScreenFragment()
         dialogFragment.show(supportFragmentManager, "signature")
     }
-
 
 
     fun run(url: String) {
@@ -172,53 +240,69 @@ class MainActivity : AppCompatActivity() {
                 Log.d("dbg", "onResponse")
                 val str_response = response.body!!.string()
                 //creating json object
-                val json_contact:JSONObject = JSONObject(str_response)
+                val json_contact: JSONObject = JSONObject(str_response)
                 Log.d("dbg", "json_contact $json_contact")
                 //creating json array
                 Log.d("dbg", "creating json array")
                 val jsonarrayInfo: JSONArray = json_contact.getJSONArray("data")
                 Log.d("dbg", "json array ok")
-                var i:Int = 0
-                val size:Int = jsonarrayInfo.length()
+                var i: Int = 0
+                val size: Int = jsonarrayInfo.length()
                 Log.d("dbg", "creating arraylist")
-                arrayList_details= ArrayList()
+                arrayList_details = ArrayList()
                 Log.d("dbg", "created arraylist")
 
-                for (i in 0.. size-1) {
+                for (i in 0..size - 1) {
                     Log.d("dbg", "for loop $i")
-                    val jsonObjectdetail:JSONObject=jsonarrayInfo.getJSONObject(i)
-                    val model:Model= Model();
-                    model.id=jsonObjectdetail.getString("id")
-                    model.name=jsonObjectdetail.getString("name")
-                    model.item=jsonObjectdetail.getString("item")
-                    model.item=jsonObjectdetail.getString("description")
-                    model.inventory=jsonObjectdetail.getString("inventory")
-                    model.url=jsonObjectdetail.getString("url")
-                    model.tags=jsonObjectdetail.getString("tags")
+                    val jsonObjectdetail: JSONObject = jsonarrayInfo.getJSONObject(i)
+                    val model: Model = Model();
+                    model.id = jsonObjectdetail.getString("id")
+                    model.name = jsonObjectdetail.getString("name")
+                    model.item = jsonObjectdetail.getString("item")
+                    model.item = jsonObjectdetail.getString("description")
+                    model.inventory = jsonObjectdetail.getString("inventory")
+                    model.url = jsonObjectdetail.getString("url")
+                    model.tags = jsonObjectdetail.getString("tags")
 
                     arrayList_details.add(model)
                     Log.d("model", "$model")
+
                 }
 
+                testeri = arrayList_details[0].name
                 runOnUiThread {
+
                     //stuff that updates ui
-                    //val obj_adapter : CustomAdapter
-                    //obj_adapter = CustomAdapter(applicationContext,arrayList_details)
+                    val obj_adapter: CustomAdapter
+                    obj_adapter = CustomAdapter(applicationContext, arrayList_details)
                     //listView_details.adapter=obj_adapter
-                    Log.d("json", "$arrayList_details")
+
+                    Log.d("json", " in uiThread $arrayList_details")
 
                     Log.d("model", arrayList_details[0].name)
+
+
+
+
+                    //val myTextView2 = findViewById<TextView>(R.id.textView2)
+
+                    //val textView: TextView = findViewById<TextView>(R.id.basicInfoCard)
+                    //textView.text = "arrayList_details[0].name"
+
+
+
+                    Log.d("json", "UIThread finished")
+
 
                 }
 
             }
         })
     }
-
-
-
-
-
+    private fun networkOk(): Boolean {
+        val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return connService.activeNetworkInfo?.isConnected ?: false
+    }
 
 
 }

@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.4.0'
     implementation 'com.google.ar:core:1.15.0'
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.13.0'
+    implementation 'org.jetbrains.anko:anko-commons:0.10.8'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
