@@ -64,14 +64,16 @@ class MainActivity : AppCompatActivity() {
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
+    private lateinit var sneakerInfoRenderable: ViewRenderable
+    private lateinit var skibootInfoRenderable: ViewRenderable
+    private lateinit var hardhatInfoRenderable: ViewRenderable
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
-    private var modelIndex = 4
+//    private var modelIndex = 4
     lateinit var view: View
 
     private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
 
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,18 +84,10 @@ class MainActivity : AppCompatActivity() {
         showDialog()
 
 
-
-
-
-
-
-
         val sneaker = ModelRenderable.builder()
             .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
             .build()
         sneaker.thenAccept { sneakerRenderable = it }
-
-
 
 
         val hardHat = ModelRenderable.builder()
@@ -124,38 +118,66 @@ class MainActivity : AppCompatActivity() {
         ViewRenderable.builder()
             .setView(this, view)
             .build()
-            .thenAccept { renderable -> productNameRenderable = renderable }
+            .thenAccept { renderable -> productNameRenderable = renderable
 
+            }
+
+        ViewRenderable.builder()
+            .setView(this, view)
+            .build()
+            .thenAccept { renderable -> sneakerInfoRenderable = renderable
+//                view.basicInfoCard.text = arrayList_details[0].name
+            }
+
+        ViewRenderable.builder()
+            .setView(this, view)
+            .build()
+            .thenAccept { renderable -> skibootInfoRenderable = renderable
+//                view.basicInfoCard.text = arrayList_details[1].name
+                }
+
+        ViewRenderable.builder()
+            .setView(this, view)
+            .build()
+            .thenAccept { renderable -> hardhatInfoRenderable = renderable
+//                view.basicInfoCard.text = arrayList_details[2].name
+                }
 
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
         }
         //test network
-                if (networkOk()) {
-                    doAsync{
-                        run(url)
-                        uiThread {
-                            //textView2.text = "moi"
-                            Log.d("dbg", "asyncUIThread modelindex $modelIndex")
-                            textView123.text = arrayList_details[0].name
-                            view.basicInfoCard.text = arrayList_details[modelIndex].name
-                        }
-
-                    }
+        if (networkOk()) {
+            doAsync {
+                run(url)
+                uiThread {
+//                    //textView2.text = "moi"
+//                    Log.d("dbg", "asyncUIThread modelindex $modelIndex")
+//                    textView123.text = arrayList_details[0].name
+//                    view.basicInfoCard.text = arrayList_details[modelIndex].name
                 }
+
+            }
+        }
 
     }
 
     private fun inflate(i: Int) {
         val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
         view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
-        modelIndex = i
-        Log.d("dbg", "inflate modelIndex $modelIndex")
+//        Log.d("dbg", "inflate modelIndex $modelIndex")
         Log.d("dbg", "view!! ${view.id}")
-        view.basicInfoCard.text = arrayList_details[modelIndex].name
+        view.basicInfoCard.text = arrayList_details[i].name
 
-        //testing textview in the corner
-        textView123.text = arrayList_details[modelIndex].name
+    }
+    private fun setInvisible(node1:TransformableNode,  node2:TransformableNode) {
+        if (node1.isEnabled) {
+            node1.isEnabled = !node1.isEnabled
+        }
+        if (node2.isEnabled) {
+            node2.isEnabled = !node2.isEnabled
+        }
+
     }
 
     private fun frameUpdate() {
@@ -170,9 +192,8 @@ class MainActivity : AppCompatActivity() {
                 TrackingState.PAUSED -> {
                     val text = "Detected Image: " + it.name + " - need more info"
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-                    textView123.text = text
-
                 }
+
                 TrackingState.TRACKING -> {
                     Log.d("tracking", "hees")
                     var anchors = it.anchors
@@ -182,35 +203,78 @@ class MainActivity : AppCompatActivity() {
                         val anchor = it.createAnchor(pose)
                         val anchorNode = AnchorNode(anchor)
                         anchorNode.setParent(fragment.arSceneView.scene)
-                        val imgNode = TransformableNode(fragment.transformationSystem)
+//                        val imgNode = TransformableNode(fragment.transformationSystem)
+                        val skibootNode = TransformableNode(fragment.transformationSystem)
+                        val hardHatNode = TransformableNode(fragment.transformationSystem)
+                        val sneakerNode = TransformableNode(fragment.transformationSystem)
                         val textNode = TransformableNode(fragment.transformationSystem)
+                        val sneakerInfoNode = TransformableNode(fragment.transformationSystem)
+                        val skibootInfoNode = TransformableNode(fragment.transformationSystem)
+                        val hardhatInfoNode = TransformableNode(fragment.transformationSystem)
 
-                        imgNode.setParent(anchorNode)
-                        imgNode.setLocalRotation(
-                            Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f)
-                        )
-                        textNode.setParent(imgNode)
-                        textNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                        textNode.renderable = productNameRenderable
+                        sneakerNode.setParent(anchorNode)
+                        sneakerInfoNode.setParent(sneakerNode)
+                        sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                        sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
 
-                        when {
-                            it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
-                            it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
-                            it.name == "skiboot" -> imgNode.renderable = skiBootRenderable
-                        }
+                        skibootNode.setParent(anchorNode)
+                        skibootInfoNode.setParent(skibootNode)
+                        skibootNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                        skibootInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+                        hardHatNode.setParent(anchorNode)
+                        hardhatInfoNode.setParent(hardHatNode)
+                        hardHatNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                        hardhatInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+//                        textNode.renderable = productNameRenderable
+//                        sneakerInfoNode.renderable = sneakerInfoRenderable
+//                        skibootInfoNode.renderable = skibootInfoRenderable
+//                        hardhatInfoNode.renderable = hardhatInfoRenderable
+
+//                        when {
+//                            it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
+//                            it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
+//                            it.name == "skiboot" -> skibootNode.renderable = skiBootRenderable
+//                        }
                         if (it.name == "karhuSneaker") {
-                            Log.d("dbg", "olen karhu")
-                            inflate(1)
-                            Log.d("dbg", "modelIndex $modelIndex")
+//                            inflate(1)
+                            sneakerNode.renderable = sneakerRenderable
+                            sneakerInfoNode.renderable = sneakerInfoRenderable
+
+                            view.basicInfoCard.text = arrayList_details[0].name
+                            view.description.text = arrayList_details[0].desc
+                            view.url.text = arrayList_details[0].url
+
+                            setInvisible(hardHatNode, skibootNode)
                         }
                         if (it.name == "skiboot") {
-                            Log.d("dbg", "olen mono")
-                            inflate(3)
-                            Log.d("dbg", "modelIndex $modelIndex")
+//                            inflate(3)
+                            skibootNode.renderable = skiBootRenderable
+                            skibootInfoNode.renderable = skibootInfoRenderable
+
+                            view.basicInfoCard.text = arrayList_details[1].name
+                            view.description.text = arrayList_details[1].desc
+                            view.url.text = arrayList_details[1].url
+
+                            setInvisible(hardHatNode, sneakerNode)
+                        }
+
+                        if (it.name == "hardhat") {
+//                            inflate(0)
+                            hardHatNode.renderable = hardHatRenderable
+                            hardhatInfoNode.renderable = hardhatInfoRenderable
+
+                            view.basicInfoCard.text = arrayList_details[2].name
+                            view.description.text = arrayList_details[2].desc
+                            view.url.text = arrayList_details[2].url
+
+                            setInvisible(sneakerNode, skibootNode)
                         }
 
                     }
                 }
+
                 TrackingState.STOPPED -> {
                     val text = "Tracking stopped: " + it.name
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
@@ -259,7 +323,7 @@ class MainActivity : AppCompatActivity() {
                     model.id = jsonObjectdetail.getString("id")
                     model.name = jsonObjectdetail.getString("name")
                     model.item = jsonObjectdetail.getString("item")
-                    model.item = jsonObjectdetail.getString("description")
+                    model.desc = jsonObjectdetail.getString("description")
                     model.inventory = jsonObjectdetail.getString("inventory")
                     model.url = jsonObjectdetail.getString("url")
                     model.tags = jsonObjectdetail.getString("tags")
@@ -282,13 +346,10 @@ class MainActivity : AppCompatActivity() {
                     Log.d("model", arrayList_details[0].name)
 
 
-
-
                     //val myTextView2 = findViewById<TextView>(R.id.textView2)
 
                     //val textView: TextView = findViewById<TextView>(R.id.basicInfoCard)
                     //textView.text = "arrayList_details[0].name"
-
 
 
                     Log.d("json", "UIThread finished")
@@ -299,6 +360,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
     private fun networkOk(): Boolean {
         val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connService.activeNetworkInfo?.isConnected ?: false
@@ -306,5 +368,3 @@ class MainActivity : AppCompatActivity() {
 
 
 }
-
-
