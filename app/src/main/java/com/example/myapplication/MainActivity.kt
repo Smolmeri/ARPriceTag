@@ -170,14 +170,33 @@ class MainActivity : AppCompatActivity() {
         view.basicInfoCard.text = arrayList_details[i].name
 
     }
-    private fun setInvisible(node1:TransformableNode,  node2:TransformableNode) {
+    private fun setInvisible(node1:TransformableNode) {
         if (node1.isEnabled) {
-            node1.isEnabled = !node1.isEnabled
+            Log.d("aa", "first node changed")
+            node1.isEnabled = false
         }
-        if (node2.isEnabled) {
-            node2.isEnabled = !node2.isEnabled
+//        if (node2.isEnabled) {
+//            Log.d("visible", "second node changed")
+//            node2.isEnabled = false
+//        }
+
+    }
+
+    private fun removeRenderable( _node1: AnchorNode? ) {
+        if (_node1 != null) {
+            var node1 = _node1
+            fragment.getArSceneView().getScene().removeChild(node1)
+            node1.getAnchor()?.detach()
+            node1.setParent(null)
+            node1 = null
         }
 
+//        if (node2 != null) {
+//            fragment.getArSceneView().getScene().removeChild(node2)
+//            node2.getAnchor()?.detach()
+//            node2.setParent(null)
+////            node2 = null
+//        }
     }
 
     private fun frameUpdate() {
@@ -204,28 +223,23 @@ class MainActivity : AppCompatActivity() {
                         val anchorNode = AnchorNode(anchor)
                         anchorNode.setParent(fragment.arSceneView.scene)
 //                        val imgNode = TransformableNode(fragment.transformationSystem)
-                        val skibootNode = TransformableNode(fragment.transformationSystem)
-                        val hardHatNode = TransformableNode(fragment.transformationSystem)
-                        val sneakerNode = TransformableNode(fragment.transformationSystem)
-                        val textNode = TransformableNode(fragment.transformationSystem)
-                        val sneakerInfoNode = TransformableNode(fragment.transformationSystem)
-                        val skibootInfoNode = TransformableNode(fragment.transformationSystem)
-                        val hardhatInfoNode = TransformableNode(fragment.transformationSystem)
+                        var skibootNode = TransformableNode(fragment.transformationSystem)
+                        var hardHatNode = TransformableNode(fragment.transformationSystem)
+                        var sneakerNode = TransformableNode(fragment.transformationSystem)
+                        var textNode = TransformableNode(fragment.transformationSystem)
+                        var sneakerInfoNode = TransformableNode(fragment.transformationSystem)
+                        var skibootInfoNode = TransformableNode(fragment.transformationSystem)
+                        var hardhatInfoNode = TransformableNode(fragment.transformationSystem)
 
-                        sneakerNode.setParent(anchorNode)
-                        sneakerInfoNode.setParent(sneakerNode)
-                        sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                        sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
 
-                        skibootNode.setParent(anchorNode)
-                        skibootInfoNode.setParent(skibootNode)
-                        skibootNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                        skibootInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                        button2.setOnClickListener {
+                            Log.d("aa", "button Clicked")
+                            setInvisible(sneakerNode)
+//                            removeRenderable(anchorNode)
+                        }
 
-                        hardHatNode.setParent(anchorNode)
-                        hardhatInfoNode.setParent(hardHatNode)
-                        hardHatNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                        hardhatInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+
 
 //                        textNode.renderable = productNameRenderable
 //                        sneakerInfoNode.renderable = sneakerInfoRenderable
@@ -239,37 +253,74 @@ class MainActivity : AppCompatActivity() {
 //                        }
                         if (it.name == "karhuSneaker") {
 //                            inflate(1)
+
+                            sneakerNode.setParent(anchorNode)
+                            sneakerInfoNode.setParent(sneakerNode)
+                            Log.d("aa", "1st")
+                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+
                             sneakerNode.renderable = sneakerRenderable
                             sneakerInfoNode.renderable = sneakerInfoRenderable
+                            Log.d("aa", "1st rendered")
 
                             view.basicInfoCard.text = arrayList_details[0].name
                             view.description.text = arrayList_details[0].desc
                             view.url.text = arrayList_details[0].url
 
-                            setInvisible(hardHatNode, skibootNode)
                         }
                         if (it.name == "skiboot") {
 //                            inflate(3)
-                            skibootNode.renderable = skiBootRenderable
-                            skibootInfoNode.renderable = skibootInfoRenderable
+//                            skibootNode.setParent(anchorNode)
+//                            skibootInfoNode.setParent(skibootNode)
+//                            skibootNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+//                            skibootInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+//                            skibootNode.renderable = skiBootRenderable
+//                            skibootInfoNode.renderable = skibootInfoRenderable
+                            sneakerNode.setParent(anchorNode)
+                            sneakerInfoNode.setParent(sneakerNode)
+                            Log.d("aa", "2nd")
+                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+
+                            sneakerNode.renderable = skiBootRenderable
+                            sneakerInfoNode.renderable = skibootInfoRenderable
+                            Log.d("aa", "2nd rendered")
 
                             view.basicInfoCard.text = arrayList_details[1].name
                             view.description.text = arrayList_details[1].desc
                             view.url.text = arrayList_details[1].url
 
-                            setInvisible(hardHatNode, sneakerNode)
                         }
 
                         if (it.name == "hardhat") {
 //                            inflate(0)
-                            hardHatNode.renderable = hardHatRenderable
-                            hardhatInfoNode.renderable = hardhatInfoRenderable
+
+//                            hardHatNode.setParent(anchorNode)
+//                            hardhatInfoNode.setParent(hardHatNode)
+//                            hardHatNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+//                            hardhatInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+//
+//                            hardHatNode.renderable = hardHatRenderable
+//                            hardhatInfoNode.renderable = hardhatInfoRenderable
+                            sneakerNode.setParent(anchorNode)
+                            sneakerInfoNode.setParent(sneakerNode)
+                            Log.d("aa", "3rd")
+                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+
+
+                            sneakerNode.renderable = hardHatRenderable
+                            sneakerInfoNode.renderable = hardhatInfoRenderable
+                            Log.d("aa", "3rd rendered")
 
                             view.basicInfoCard.text = arrayList_details[2].name
                             view.description.text = arrayList_details[2].desc
                             view.url.text = arrayList_details[2].url
 
-                            setInvisible(sneakerNode, skibootNode)
                         }
 
                     }
