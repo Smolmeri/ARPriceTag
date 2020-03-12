@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.DpToMetersViewSizer
@@ -57,11 +58,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         //remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        showDialog()
         setContentView(R.layout.activity_main)
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = this.findViewById(R.id.fit_to_scan_img)
-
         showDialog()
 
         /** Create Models **/
@@ -133,7 +132,7 @@ class MainActivity : AppCompatActivity() {
 
     /** Helper function to remove current nodes from scene **/
 
-    private fun setInvisible(node1: TransformableNode) {
+    private fun setInvisible(node1: Node) {
         if (node1.isEnabled) {
             node1.isEnabled = false
         }
@@ -141,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     /** Loop through color options and change renderables color atribute using rgb values from list **/
 
-    private fun changeColor(node: TransformableNode){
+    private fun changeColor(node: Node){
         var colorList = mutableListOf(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
         if (node != null) {
             node.renderable?.material?.setFloat3(
@@ -163,10 +162,12 @@ class MainActivity : AppCompatActivity() {
             } catch (e: IOException)
             {
                 Log.d("check", "went in to catch")
-               Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
+               Toast.makeText(this, "No more colors", Toast.LENGTH_SHORT).show()
             }
         } else {
-            Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
+            a = 0
+            b = 1
+            c = 2
         }
 
 
@@ -183,10 +184,6 @@ class MainActivity : AppCompatActivity() {
 
         val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
 
-
-
-
-
         updatedAugmentedImages.forEach {
             when (it.trackingState) {
 
@@ -197,33 +194,34 @@ class MainActivity : AppCompatActivity() {
 
                 TrackingState.TRACKING -> {
 
-
                     var anchors = it.anchors
 
-
-
                     if (anchors.isEmpty()) {
+
                         fitToScanImageView?.visibility = View.GONE
+
                         val pose = it.centerPose
                         val anchor = it.createAnchor(pose)
                         val anchorNode = AnchorNode(anchor)
                         anchorNode.setParent(fragment.arSceneView.scene)
-                        var skibootNode = TransformableNode(fragment.transformationSystem)
-                        var hardHatNode = TransformableNode(fragment.transformationSystem)
-                        var sneakerNode = TransformableNode(fragment.transformationSystem)
-                        var textNode = TransformableNode(fragment.transformationSystem)
-                        var sneakerInfoNode = TransformableNode(fragment.transformationSystem)
-                        var skibootInfoNode = TransformableNode(fragment.transformationSystem)
-                        var hardhatInfoNode = TransformableNode(fragment.transformationSystem)
+
+                        var modelNode = Node()
+                        var modelInfoNode = TransformableNode(fragment.transformationSystem)
+
+                        modelNode.setParent(anchorNode)
+                        modelInfoNode.setParent(modelNode)
+
+                        modelNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 180f))
+                        modelInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                         /** Delete button **/
                         button2.setOnClickListener {
-                            setInvisible(sneakerNode)
+                            setInvisible(modelNode)
                         }
 
                         /** Change color button **/
                         button3.setOnClickListener {
-                            changeColor(sneakerNode)
+                            changeColor(modelNode)
                         }
 
                         /** Checks recognised image with database and implements correct model,
@@ -231,15 +229,8 @@ class MainActivity : AppCompatActivity() {
 
                         if (it.name == "karhuSneaker") {
 
-                            sneakerNode.setParent(anchorNode)
-                            sneakerInfoNode.setParent(sneakerNode)
-
-                            Log.d("aa", "1st")
-                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
-
-                            sneakerNode.renderable = sneakerRenderable
-                            sneakerInfoNode.renderable = sneakerInfoRenderable
+                            modelNode.renderable = sneakerRenderable
+                            modelInfoNode.renderable = sneakerInfoRenderable
                             sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
 
                             view.basicInfoCard.text = arrayList_details[0].name
@@ -248,28 +239,10 @@ class MainActivity : AppCompatActivity() {
 
                         }
                         if (it.name == "skiboot") {
-                            sneakerNode.setParent(anchorNode)
-                            sneakerInfoNode.setParent(sneakerNode)
 
-                            sneakerNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(1f, 0f, 0f),
-                                    -180f
-                                )
-                            )
-                            sneakerInfoNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(
-                                        1f,
-                                        0f,
-                                        0f
-                                    ), 90f
-                                )
-                            )
-
-                            sneakerNode.renderable = skiBootRenderable
-                            sneakerInfoNode.renderable = skibootInfoRenderable
-                            sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
+                            modelNode.renderable = skiBootRenderable
+                            modelInfoNode.renderable = skibootInfoRenderable
+                            skibootInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
 
                             view.basicInfoCard.text = arrayList_details[1].name
                             view.description.text = arrayList_details[1].desc
@@ -279,28 +252,9 @@ class MainActivity : AppCompatActivity() {
 
                         if (it.name == "hardhat") {
 
-                            sneakerNode.setParent(anchorNode)
-                            sneakerInfoNode.setParent(sneakerNode)
-
-                            sneakerNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(1f, 0f, 0f),
-                                    -180f
-                                )
-                            )
-                            sneakerInfoNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(
-                                        1f,
-                                        0f,
-                                        0f
-                                    ), 90f
-                                )
-                            )
-
-                            sneakerNode.renderable = hardHatRenderable
-                            sneakerInfoNode.renderable = hardhatInfoRenderable
-                            sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
+                            modelNode.renderable = hardHatRenderable
+                            modelInfoNode.renderable = hardhatInfoRenderable
+                            hardhatInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
 
                             view.basicInfoCard.text = arrayList_details[2].name
                             view.description.text = arrayList_details[2].desc
@@ -342,7 +296,8 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
 
                 val str_response = response.body!!.string()
-                //creating json object
+
+                /** creating json object **/
                 val json_contact: JSONObject = JSONObject(str_response)
 
 
@@ -375,8 +330,6 @@ class MainActivity : AppCompatActivity() {
                     model.tags = finalTag
 
                     arrayList_details.add(model)
-
-
                 }
 
             }
