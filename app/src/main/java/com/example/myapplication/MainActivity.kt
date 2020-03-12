@@ -31,13 +31,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 
-//@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
     var arrayList_details: ArrayList<Model> = ArrayList()
     private lateinit var fragment: ArFragment
     private lateinit var nColor: List<Float>
-    private var testeri = "moi"
     private val renderScale = 1000
     private var fitToScanImageView: ImageView? = null
     private var sneakerRenderable: ModelRenderable? = null
@@ -126,17 +124,17 @@ class MainActivity : AppCompatActivity() {
 
                 }
             }
-        } else {Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG )}
+        } else {
+            Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG)
+        }
 
-            }
+    }
 
 
+    /** Helper function to remove current nodes from scene **/
 
-     /** Helper function to remove current nodes from scene **/
-
-    private fun setInvisible(node1:TransformableNode) {
+    private fun setInvisible(node1: TransformableNode) {
         if (node1.isEnabled) {
-            Log.d("aa", "first node changed")
             node1.isEnabled = false
         }
     }
@@ -146,7 +144,12 @@ class MainActivity : AppCompatActivity() {
     private fun changeColor(node: TransformableNode){
         var colorList = mutableListOf(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
         if (node != null) {
-            node.renderable?.material?.setFloat3("baseColorTint", colorList[a], colorList[b], colorList[c])
+            node.renderable?.material?.setFloat3(
+                "baseColorTint",
+                colorList[a],
+                colorList[b],
+                colorList[c]
+            )
         }
 
         /** Create counter to change color each time user clicks on button **/
@@ -163,11 +166,9 @@ class MainActivity : AppCompatActivity() {
                Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
             }
         } else {
-            Log.d("check", "went in to else")
             Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
         }
 
-        Log.d("numb", "${a}, ${b}, ${c}")
 
     }
 
@@ -181,13 +182,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
-        /*if (updatedAugmentedImages.size > 1){
-            for (i in updatedAugmentedImages){
-                updatedAugmentedImages.remove(i)
-            }
-        }*/
 
-        Log.d("updatedimage", "$updatedAugmentedImages")
+
+
+
+
         updatedAugmentedImages.forEach {
             when (it.trackingState) {
 
@@ -199,9 +198,7 @@ class MainActivity : AppCompatActivity() {
                 TrackingState.TRACKING -> {
 
 
-                    Log.d("tracking", "hees")
                     var anchors = it.anchors
-                    Log.d("anchors", "ANCHORS: ${it.anchors}")
 
 
 
@@ -211,7 +208,6 @@ class MainActivity : AppCompatActivity() {
                         val anchor = it.createAnchor(pose)
                         val anchorNode = AnchorNode(anchor)
                         anchorNode.setParent(fragment.arSceneView.scene)
-//                        val imgNode = TransformableNode(fragment.transformationSystem)
                         var skibootNode = TransformableNode(fragment.transformationSystem)
                         var hardHatNode = TransformableNode(fragment.transformationSystem)
                         var sneakerNode = TransformableNode(fragment.transformationSystem)
@@ -222,14 +218,11 @@ class MainActivity : AppCompatActivity() {
 
                         /** Delete button **/
                         button2.setOnClickListener {
-                            Log.d("aa", "button Clicked")
                             setInvisible(sneakerNode)
-//                            removeRenderable(anchorNode)
                         }
 
                         /** Change color button **/
                         button3.setOnClickListener {
-                            Log.d("aa", "color button clicked")
                             changeColor(sneakerNode)
                         }
 
@@ -247,30 +240,40 @@ class MainActivity : AppCompatActivity() {
 
                             sneakerNode.renderable = sneakerRenderable
                             sneakerInfoNode.renderable = sneakerInfoRenderable
-                            Log.d("aa", "1st rendered")
                             sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
 
                             view.basicInfoCard.text = arrayList_details[0].name
                             view.description.text = arrayList_details[0].desc
-                            view.url.text = arrayList_details[0].url
+                            view.tags.text = arrayList_details[0].tags
 
                         }
                         if (it.name == "skiboot") {
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
 
-                            Log.d("aa", "2nd")
-                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
+                            sneakerNode.setLocalRotation(
+                                Quaternion.axisAngle(
+                                    Vector3(1f, 0f, 0f),
+                                    -180f
+                                )
+                            )
+                            sneakerInfoNode.setLocalRotation(
+                                Quaternion.axisAngle(
+                                    Vector3(
+                                        1f,
+                                        0f,
+                                        0f
+                                    ), 90f
+                                )
+                            )
 
                             sneakerNode.renderable = skiBootRenderable
                             sneakerInfoNode.renderable = skibootInfoRenderable
                             sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
-                            Log.d("aa", "2nd rendered")
 
                             view.basicInfoCard.text = arrayList_details[1].name
                             view.description.text = arrayList_details[1].desc
-                            view.url.text = arrayList_details[1].url
+                            view.tags.text = arrayList_details[1].tags
 
                         }
 
@@ -278,19 +281,30 @@ class MainActivity : AppCompatActivity() {
 
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
-                            Log.d("aa", "3rd")
 
-                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
+                            sneakerNode.setLocalRotation(
+                                Quaternion.axisAngle(
+                                    Vector3(1f, 0f, 0f),
+                                    -180f
+                                )
+                            )
+                            sneakerInfoNode.setLocalRotation(
+                                Quaternion.axisAngle(
+                                    Vector3(
+                                        1f,
+                                        0f,
+                                        0f
+                                    ), 90f
+                                )
+                            )
 
                             sneakerNode.renderable = hardHatRenderable
                             sneakerInfoNode.renderable = hardhatInfoRenderable
                             sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
-                            Log.d("aa", "3rd rendered")
 
                             view.basicInfoCard.text = arrayList_details[2].name
                             view.description.text = arrayList_details[2].desc
-                            view.url.text = arrayList_details[2].url
+                            view.tags.text = arrayList_details[2].tags
                         }
 
                     }
@@ -299,7 +313,6 @@ class MainActivity : AppCompatActivity() {
                 TrackingState.STOPPED -> {
                     val text = "Tracking stopped: " + it.name
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
-                    Log.d("dbg","TRACKING STOPPED ${it.name}")
                 }
             }
         }
@@ -317,7 +330,6 @@ class MainActivity : AppCompatActivity() {
     /** Fetches data from database and parses JSON into strings for futher use **/
 
     private fun run(url: String) {
-        Log.d("dbg", "fetch started")
         val request = Request.Builder()
             .url(url)
             .build()
@@ -328,23 +340,22 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                Log.d("dbg", "onResponse")
+
                 val str_response = response.body!!.string()
                 //creating json object
                 val json_contact: JSONObject = JSONObject(str_response)
-                Log.d("dbg", "json_contact $json_contact")
-                //creating json array
-                Log.d("dbg", "creating json array")
+
+
                 val jsonarrayInfo: JSONArray = json_contact.getJSONArray("data")
-                Log.d("dbg", "json array ok")
+
                 var i: Int = 0
                 val size: Int = jsonarrayInfo.length()
-                Log.d("dbg", "creating arraylist")
+
                 arrayList_details = ArrayList()
-                Log.d("dbg", "created arraylist")
+
 
                 for (i in 0..size - 1) {
-                    Log.d("dbg", "for loop $i")
+
                     val jsonObjectdetail: JSONObject = jsonarrayInfo.getJSONObject(i)
                     val model: Model = Model();
                     model.id = jsonObjectdetail.getString("id")
@@ -354,12 +365,19 @@ class MainActivity : AppCompatActivity() {
                     model.inventory = jsonObjectdetail.getString("inventory")
                     model.url = jsonObjectdetail.getString("url")
                     model.tags = jsonObjectdetail.getString("tags")
+                    var delimiter = ","
+
+                    var ch = model.tags
+                    var str = ch.toString()
+                    val reg = Regex("\"")
+                    var list = str.split(reg)
+                    var finalTag: String = "#" + list[1] + " #" + list[3] + " #" + list[5]
+                    model.tags = finalTag
 
                     arrayList_details.add(model)
-                    Log.d("model", "$model")
+
 
                 }
-                testeri = arrayList_details[0].name
 
             }
         })
@@ -371,5 +389,6 @@ class MainActivity : AppCompatActivity() {
         val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connService.activeNetworkInfo?.isConnected ?: false
     }
+
 
 }
