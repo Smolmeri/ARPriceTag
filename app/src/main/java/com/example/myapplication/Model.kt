@@ -1,7 +1,5 @@
 package com.example.myapplication
 
-import java.util.*
-
 public class Model{
     lateinit var id: String
     lateinit var name: String
@@ -10,7 +8,6 @@ public class Model{
     lateinit var inventory: String
     lateinit var url: String
     lateinit var tags: String
-//    lateinit var colors: Array<String>
 
 
     constructor(id: String, name: String, item:String, desc: String, inventory: String, url:String, tags:String, colors: Array<String>) {
@@ -21,7 +18,6 @@ public class Model{
         this.inventory = inventory
         this.url = url
         this.tags = tags
-//        this.colors = colors
     }
 
     constructor()
