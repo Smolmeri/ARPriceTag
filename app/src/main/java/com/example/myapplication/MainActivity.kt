@@ -242,7 +242,7 @@ class MainActivity : AppCompatActivity() {
                             sneakerInfoNode.setParent(sneakerNode)
 
                             Log.d("aa", "1st")
-                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 180f))
                             sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                             sneakerNode.renderable = sneakerRenderable
