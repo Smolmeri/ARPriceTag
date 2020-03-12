@@ -1,6 +1,19 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.DialogInterface
+import android.graphics.BitmapFactory
+import android.net.ConnectivityManager
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.service.vr.VrListenerService
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.Window
+import android.widget.Button
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
@@ -9,10 +22,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -41,21 +56,26 @@ class MainActivity : AppCompatActivity() {
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
+    private lateinit var productNameRenderableSkiboot: ViewRenderable
     private lateinit var sneakerInfoRenderable: ViewRenderable
     private lateinit var skibootInfoRenderable: ViewRenderable
     private lateinit var hardhatInfoRenderable: ViewRenderable
+
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
     var a = 0
     var b = 0
     var c = 0
     lateinit var view: View
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        showDialog()
         setContentView(R.layout.activity_main)
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
+
         showDialog()
 
         /** Create Models **/
@@ -94,10 +114,12 @@ class MainActivity : AppCompatActivity() {
             .build()
             .thenAccept { renderable -> sneakerInfoRenderable = renderable }
 
+        modelIndex = 0
         ViewRenderable.builder()
             .setView(this, view)
             .build()
             .thenAccept { renderable -> skibootInfoRenderable = renderable }
+
 
         ViewRenderable.builder()
             .setView(this, view)
@@ -114,9 +136,13 @@ class MainActivity : AppCompatActivity() {
             doAsync {
                 run(url)
                 uiThread {
+
                 }
             }
         } else Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG )
+
+            }
+        }
 
     }
 
@@ -168,17 +194,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
+        /*if (updatedAugmentedImages.size > 1){
+            for (i in updatedAugmentedImages){
+                updatedAugmentedImages.remove(i)
+            }
+        }*/
+
+        Log.d("updatedimage", "$updatedAugmentedImages")
         updatedAugmentedImages.forEach {
-            Log.d("tracking", "${arFrame.camera.trackingState}")
             when (it.trackingState) {
+
                 TrackingState.PAUSED -> {
                     val text = "Detected Image: " + it.name + " - need more info"
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
                 }
 
                 TrackingState.TRACKING -> {
+
+
                     Log.d("tracking", "hees")
                     var anchors = it.anchors
+                    Log.d("anchors", "ANCHORS: ${it.anchors}")
+
+
+
                     if (anchors.isEmpty()) {
                         fitToScanImageView?.visibility = View.GONE
                         val pose = it.centerPose
@@ -270,6 +309,7 @@ class MainActivity : AppCompatActivity() {
                 TrackingState.STOPPED -> {
                     val text = "Tracking stopped: " + it.name
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+                    Log.d("dbg","TRACKING STOPPED ${it.name}")
                 }
             }
         }
@@ -280,6 +320,7 @@ class MainActivity : AppCompatActivity() {
     private fun showDialog() {
         val dialogFragment = FullScreenFragment()
         dialogFragment.show(supportFragmentManager, "signature")
+        //AlertDialog.Builder(this, R.style.DialogTheme).show()
     }
 
 
@@ -329,6 +370,7 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 testeri = arrayList_details[0].name
+
             }
         })
     }
@@ -339,4 +381,5 @@ class MainActivity : AppCompatActivity() {
         val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connService.activeNetworkInfo?.isConnected ?: false
     }
+
 }
