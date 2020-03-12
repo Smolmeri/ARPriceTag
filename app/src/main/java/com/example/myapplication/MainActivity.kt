@@ -16,6 +16,7 @@ import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.DpToMetersViewSizer
 import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.ViewRenderable
 import com.google.ar.sceneform.ux.ArFragment
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragment: ArFragment
     private lateinit var nColor: List<Float>
     private var testeri = "moi"
+    private val renderScale = 1000
     private var fitToScanImageView: ImageView? = null
     private var sneakerRenderable: ModelRenderable? = null
     private var hardHatRenderable: ModelRenderable? = null
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         showDialog()
         setContentView(R.layout.activity_main)
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
-        fitToScanImageView = findViewById(R.id.fit_to_scan_img)
+        fitToScanImageView = this.findViewById(R.id.fit_to_scan_img)
 
         showDialog()
 
@@ -172,6 +174,7 @@ class MainActivity : AppCompatActivity() {
     /** Begin tracking of images, if tracking state is Tracking then check images with AugmentedImages database for mach **/
 
     private fun frameUpdate() {
+
         val arFrame = fragment.arSceneView.arFrame
         if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
             return
@@ -240,11 +243,12 @@ class MainActivity : AppCompatActivity() {
 
                             Log.d("aa", "1st")
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                             sneakerNode.renderable = sneakerRenderable
                             sneakerInfoNode.renderable = sneakerInfoRenderable
                             Log.d("aa", "1st rendered")
+                            sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
 
                             view.basicInfoCard.text = arrayList_details[0].name
                             view.description.text = arrayList_details[0].desc
@@ -257,10 +261,11 @@ class MainActivity : AppCompatActivity() {
 
                             Log.d("aa", "2nd")
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                             sneakerNode.renderable = skiBootRenderable
                             sneakerInfoNode.renderable = skibootInfoRenderable
+                            sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
                             Log.d("aa", "2nd rendered")
 
                             view.basicInfoCard.text = arrayList_details[1].name
@@ -276,10 +281,11 @@ class MainActivity : AppCompatActivity() {
                             Log.d("aa", "3rd")
 
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                             sneakerNode.renderable = hardHatRenderable
                             sneakerInfoNode.renderable = hardhatInfoRenderable
+                            sneakerInfoRenderable.sizer = DpToMetersViewSizer(renderScale)
                             Log.d("aa", "3rd rendered")
 
                             view.basicInfoCard.text = arrayList_details[2].name
