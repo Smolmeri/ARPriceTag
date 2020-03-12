@@ -3,4 +3,6 @@
     <string name="price_tag_header">PRICE TAG HEADER</string>
     <string name="test_label">It works!</string>
     <string name="dialogText">Scan a product and view it in 3D!</string>
+    <string name="intro">Welcome to Shopp<font fgcolor='#ff7043'>AR</font>!\nScan a product and view it in 3D</string>
+    <string name="logotext">Shopp<font fgcolor='#ff7043'>AR</font></string>
 </resources>

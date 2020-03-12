@@ -1,22 +1,27 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.DialogInterface
 import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.service.vr.VrListenerService
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.*
 import com.google.ar.sceneform.AnchorNode
+import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -64,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
+    private lateinit var productNameRenderableSkiboot: ViewRenderable
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
     private var modelIndex = 4
     lateinit var view: View
@@ -73,15 +79,14 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        showDialog()
         setContentView(R.layout.activity_main)
         fragment = supportFragmentManager.findFragmentById(R.id.arimage_fragment) as ArFragment
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
-        showDialog()
-
-
 
 
 
@@ -92,8 +97,6 @@ class MainActivity : AppCompatActivity() {
             .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
             .build()
         sneaker.thenAccept { sneakerRenderable = it }
-
-
 
 
         val hardHat = ModelRenderable.builder()
@@ -121,61 +124,100 @@ class MainActivity : AppCompatActivity() {
         //Log.d("dbg", "oncreate ${arrayList_details[0].name}")
 
 
+        modelIndex = 0
         ViewRenderable.builder()
             .setView(this, view)
             .build()
             .thenAccept { renderable -> productNameRenderable = renderable }
+
+        modelIndex = 2
+        ViewRenderable.builder()
+            .setView(this, view)
+            .build()
+            .thenAccept { renderable -> productNameRenderableSkiboot = renderable }
 
 
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
         }
         //test network
-                if (networkOk()) {
-                    doAsync{
-                        run(url)
-                        uiThread {
-                            //textView2.text = "moi"
-                            Log.d("dbg", "asyncUIThread modelindex $modelIndex")
-                            textView123.text = arrayList_details[0].name
-                            view.basicInfoCard.text = arrayList_details[modelIndex].name
-                        }
-
-                    }
+        if (networkOk()) {
+            doAsync {
+                run(url)
+                uiThread {
+                    //textView2.text = "moi"
+                    Log.d("dbg", "asyncUIThread modelindex $modelIndex")
+                    textView123.text = arrayList_details[0].name
+                    basicInfoText(modelIndex)
                 }
 
+            }
+        }
+
+    }
+
+    private fun basicInfoText (id: Int) {
+        view.basicInfoCard.text = arrayList_details[id].name
     }
 
     private fun inflate(i: Int) {
-        val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
-        view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
-        modelIndex = i
-        Log.d("dbg", "inflate modelIndex $modelIndex")
-        Log.d("dbg", "view!! ${view.id}")
-        view.basicInfoCard.text = arrayList_details[modelIndex].name
+        if(i==0) {
+            val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
+            view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
+            Log.d("dbg", "inflate modelIndex $modelIndex")
+            Log.d("dbg", "view!! ${view.id}")
+            view.basicInfoCard.text = arrayList_details[i].name
 
-        //testing textview in the corner
-        textView123.text = arrayList_details[modelIndex].name
+            //testing textview in the corner
+            textView123.text = arrayList_details[modelIndex].name
+        } else if (i==1) {
+            val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
+            view = inflater.inflate(R.layout.price_tag_skiboot, fragment_holder, false)
+            Log.d("dbg", "inflate modelIndex $modelIndex")
+            Log.d("dbg", "view!! ${view.id}")
+            view.basicInfoCard.text = arrayList_details[i].name
+
+            //testing textview in the corner
+            textView123.text = arrayList_details[modelIndex].name
+        }
     }
+
+
 
     private fun frameUpdate() {
         val arFrame = fragment.arSceneView.arFrame
         if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
             return
         }
+
+
         val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
+        /*if (updatedAugmentedImages.size > 1){
+            for (i in updatedAugmentedImages){
+                updatedAugmentedImages.remove(i)
+            }
+        }*/
+
+        Log.d("updatedimage", "$updatedAugmentedImages")
         updatedAugmentedImages.forEach {
-            Log.d("tracking", "${arFrame.camera.trackingState}")
             when (it.trackingState) {
+
                 TrackingState.PAUSED -> {
                     val text = "Detected Image: " + it.name + " - need more info"
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
                     textView123.text = text
 
+
                 }
                 TrackingState.TRACKING -> {
+
+
                     Log.d("tracking", "hees")
                     var anchors = it.anchors
+                    Log.d("anchors", "ANCHORS: ${it.anchors}")
+
+
+
                     if (anchors.isEmpty()) {
                         fitToScanImageView?.visibility = View.GONE
                         val pose = it.centerPose
@@ -191,7 +233,19 @@ class MainActivity : AppCompatActivity() {
                         )
                         textNode.setParent(imgNode)
                         textNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-                        textNode.renderable = productNameRenderable
+                        if (it.name == "skiboot") {
+                            basicInfoText(1)
+                            textNode.renderable = productNameRenderable
+                            Log.d("dbg", "SKIBOOTSKIBOOT productNameRenderableSkiboot")
+                        } else if (it.name == "karhuSneaker") {
+                            basicInfoText(0)
+                            textNode.renderable = productNameRenderable
+                        } else if (it.name == "hardhat") {
+                            basicInfoText(2)
+                            textNode.renderable = productNameRenderable
+                        }
+
+
 
                         when {
                             it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
@@ -214,6 +268,7 @@ class MainActivity : AppCompatActivity() {
                 TrackingState.STOPPED -> {
                     val text = "Tracking stopped: " + it.name
                     Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+                    Log.d("dbg","TRACKING STOPPED ${it.name}")
                 }
             }
         }
@@ -222,6 +277,7 @@ class MainActivity : AppCompatActivity() {
     private fun showDialog() {
         val dialogFragment = FullScreenFragment()
         dialogFragment.show(supportFragmentManager, "signature")
+        //AlertDialog.Builder(this, R.style.DialogTheme).show()
     }
 
 
@@ -282,13 +338,10 @@ class MainActivity : AppCompatActivity() {
                     Log.d("model", arrayList_details[0].name)
 
 
-
-
                     //val myTextView2 = findViewById<TextView>(R.id.textView2)
 
                     //val textView: TextView = findViewById<TextView>(R.id.basicInfoCard)
                     //textView.text = "arrayList_details[0].name"
-
 
 
                     Log.d("json", "UIThread finished")
@@ -299,6 +352,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
     private fun networkOk(): Boolean {
         val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connService.activeNetworkInfo?.isConnected ?: false
@@ -306,5 +360,6 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+
 
 
