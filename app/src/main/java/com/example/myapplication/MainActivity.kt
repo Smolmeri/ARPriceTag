@@ -1,21 +1,17 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.ar.core.*
+import com.google.ar.core.AugmentedImage
+import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
@@ -23,41 +19,22 @@ import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.ViewRenderable
 import com.google.ar.sceneform.ux.ArFragment
 import com.google.ar.sceneform.ux.TransformableNode
-import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.layout_full_screen_dialog.*
-import kotlinx.android.synthetic.main.price_tag.*
 import kotlinx.android.synthetic.main.price_tag.view.*
 import okhttp3.*
 import okio.IOException
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import org.json.JSONArray
 import org.json.JSONObject
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.uiThread
-import java.io.InputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
-
-data class Products(val data: List<Product>)
-data class Product(
-    val id: Int,
-    val name: String,
-    val item: String,
-    val description: String,
-    val inventory: Int,
-    val url: String,
-    val tags: List<String>
-)
 
 //@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
-
     var arrayList_details: ArrayList<Model> = ArrayList()
     private lateinit var fragment: ArFragment
-
+    private lateinit var nColor: List<Float>
     private var testeri = "moi"
     private var fitToScanImageView: ImageView? = null
     private var sneakerRenderable: ModelRenderable? = null
@@ -68,12 +45,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var skibootInfoRenderable: ViewRenderable
     private lateinit var hardhatInfoRenderable: ViewRenderable
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
-//    private var modelIndex = 4
+    var a = 0
+    var b = 0
+    var c = 0
     lateinit var view: View
-
-    private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
-
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         fitToScanImageView = findViewById(R.id.fit_to_scan_img)
         showDialog()
 
+        /** Create Models **/
 
         val sneaker = ModelRenderable.builder()
             .setSource(this, Uri.parse("10700_Sneaker_v201.sfb"))
@@ -101,109 +77,96 @@ class MainActivity : AppCompatActivity() {
         skiBoot.thenAccept { skiBootRenderable = it }
 
 
-        //inflate()
+        /** Inflate View layout **/
+
         val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
         view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
 
-        //toimii
-        //view.basicInfoCard.text = "moroo"
-
-
-        val textView: TextView = view?.findViewById(R.id.basicInfoCard) as TextView
-        //textView.text = "arrayList_details[0].name"
-
-        //Log.d("dbg", "oncreate ${arrayList_details[0].name}")
-
+        /** Create TextView Renderables **/
 
         ViewRenderable.builder()
             .setView(this, view)
             .build()
-            .thenAccept { renderable -> productNameRenderable = renderable
-
-            }
+            .thenAccept { renderable -> productNameRenderable = renderable }
 
         ViewRenderable.builder()
             .setView(this, view)
             .build()
-            .thenAccept { renderable -> sneakerInfoRenderable = renderable
-//                view.basicInfoCard.text = arrayList_details[0].name
-            }
+            .thenAccept { renderable -> sneakerInfoRenderable = renderable }
 
         ViewRenderable.builder()
             .setView(this, view)
             .build()
-            .thenAccept { renderable -> skibootInfoRenderable = renderable
-//                view.basicInfoCard.text = arrayList_details[1].name
-                }
+            .thenAccept { renderable -> skibootInfoRenderable = renderable }
 
         ViewRenderable.builder()
             .setView(this, view)
             .build()
-            .thenAccept { renderable -> hardhatInfoRenderable = renderable
-//                view.basicInfoCard.text = arrayList_details[2].name
-                }
+            .thenAccept { renderable -> hardhatInfoRenderable = renderable }
 
         fragment.arSceneView.scene.addOnUpdateListener { frameTime ->
             frameUpdate()
         }
-        //test network
+
+        /** Test if network is ok **/
+
         if (networkOk()) {
             doAsync {
                 run(url)
                 uiThread {
-//                    //textView2.text = "moi"
-//                    Log.d("dbg", "asyncUIThread modelindex $modelIndex")
-//                    textView123.text = arrayList_details[0].name
-//                    view.basicInfoCard.text = arrayList_details[modelIndex].name
                 }
-
             }
-        }
+        } else Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG )
 
     }
 
-    private fun inflate(i: Int) {
-        val inflater: LayoutInflater = LayoutInflater.from(applicationContext)
-        view = inflater.inflate(R.layout.price_tag, fragment_holder, false)
-//        Log.d("dbg", "inflate modelIndex $modelIndex")
-        Log.d("dbg", "view!! ${view.id}")
-        view.basicInfoCard.text = arrayList_details[i].name
+     /** Helper function to remove current nodes from scene **/
 
-    }
     private fun setInvisible(node1:TransformableNode) {
         if (node1.isEnabled) {
             Log.d("aa", "first node changed")
             node1.isEnabled = false
         }
-//        if (node2.isEnabled) {
-//            Log.d("visible", "second node changed")
-//            node2.isEnabled = false
-//        }
-
     }
 
-    private fun removeRenderable( _node1: AnchorNode? ) {
-        if (_node1 != null) {
-            var node1 = _node1
-            fragment.getArSceneView().getScene().removeChild(node1)
-            node1.getAnchor()?.detach()
-            node1.setParent(null)
-            node1 = null
+    /** Loop through color options and change renderables color atribute using rgb values from list **/
+
+    private fun changeColor(node: TransformableNode){
+        var colorList = mutableListOf<Float>(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 0.0f, 255.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
+
+        if (node != null) {
+            node.renderable?.material?.setFloat3("baseColorTint", colorList[a.inc()], colorList[b.inc()], colorList[c.inc()])
         }
 
-//        if (node2 != null) {
-//            fragment.getArSceneView().getScene().removeChild(node2)
-//            node2.getAnchor()?.detach()
-//            node2.setParent(null)
-////            node2 = null
-//        }
+        /** Create counter to change color each time user clicks on button **/
+        if (a < colorList.size) {
+            try {
+                Log.d("check", "went in to try")
+                a += 1
+                b += 1
+                c += 1
+            } catch (e: IOException)
+            {
+                Log.d("check", "went in to catch")
+               Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
+            }
+        } else {
+            Log.d("check", "went in to else")
+            Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
+        }
+
+        Log.d("numb", "${a}, ${b}, ${c}")
+
     }
+
+    /** Begin tracking of images, if tracking state is Tracking then check images with AugmentedImages database for mach **/
 
     private fun frameUpdate() {
         val arFrame = fragment.arSceneView.arFrame
         if (arFrame == null || arFrame.camera.trackingState != TrackingState.TRACKING) {
             return
         }
+
         val updatedAugmentedImages = arFrame.getUpdatedTrackables(AugmentedImage::class.java)
         updatedAugmentedImages.forEach {
             Log.d("tracking", "${arFrame.camera.trackingState}")
@@ -231,35 +194,30 @@ class MainActivity : AppCompatActivity() {
                         var skibootInfoNode = TransformableNode(fragment.transformationSystem)
                         var hardhatInfoNode = TransformableNode(fragment.transformationSystem)
 
-
+                        /** Delete button **/
                         button2.setOnClickListener {
                             Log.d("aa", "button Clicked")
                             setInvisible(sneakerNode)
 //                            removeRenderable(anchorNode)
                         }
 
+                        /** Change color button **/
+                        button3.setOnClickListener {
+                            Log.d("aa", "color button clicked")
+                            changeColor(sneakerNode)
+                        }
 
+                        /** Checks recognised image with database and implements correct model,
+                         * textview and textiview data from JSON. Also adjusts components rotation **/
 
-
-//                        textNode.renderable = productNameRenderable
-//                        sneakerInfoNode.renderable = sneakerInfoRenderable
-//                        skibootInfoNode.renderable = skibootInfoRenderable
-//                        hardhatInfoNode.renderable = hardhatInfoRenderable
-
-//                        when {
-//                            it.name == "karhuSneaker" -> imgNode.renderable = sneakerRenderable
-//                            it.name == "hardhat" -> imgNode.renderable = hardHatRenderable
-//                            it.name == "skiboot" -> skibootNode.renderable = skiBootRenderable
-//                        }
                         if (it.name == "karhuSneaker") {
-//                            inflate(1)
 
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
+
                             Log.d("aa", "1st")
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
                             sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-
 
                             sneakerNode.renderable = sneakerRenderable
                             sneakerInfoNode.renderable = sneakerInfoRenderable
@@ -271,20 +229,12 @@ class MainActivity : AppCompatActivity() {
 
                         }
                         if (it.name == "skiboot") {
-//                            inflate(3)
-//                            skibootNode.setParent(anchorNode)
-//                            skibootInfoNode.setParent(skibootNode)
-//                            skibootNode.setLocalRotation( Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-//                            skibootInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-
-//                            skibootNode.renderable = skiBootRenderable
-//                            skibootInfoNode.renderable = skibootInfoRenderable
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
+
                             Log.d("aa", "2nd")
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
                             sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-
 
                             sneakerNode.renderable = skiBootRenderable
                             sneakerInfoNode.renderable = skibootInfoRenderable
@@ -297,21 +247,13 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         if (it.name == "hardhat") {
-//                            inflate(0)
 
-//                            hardHatNode.setParent(anchorNode)
-//                            hardhatInfoNode.setParent(hardHatNode)
-//                            hardHatNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-//                            hardhatInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-//
-//                            hardHatNode.renderable = hardHatRenderable
-//                            hardhatInfoNode.renderable = hardhatInfoRenderable
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
                             Log.d("aa", "3rd")
+
                             sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
                             sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), -180f))
-
 
                             sneakerNode.renderable = hardHatRenderable
                             sneakerInfoNode.renderable = hardhatInfoRenderable
@@ -320,7 +262,6 @@ class MainActivity : AppCompatActivity() {
                             view.basicInfoCard.text = arrayList_details[2].name
                             view.description.text = arrayList_details[2].desc
                             view.url.text = arrayList_details[2].url
-
                         }
 
                     }
@@ -334,13 +275,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** Creates fullscreen fragment for user info **/
+
     private fun showDialog() {
         val dialogFragment = FullScreenFragment()
         dialogFragment.show(supportFragmentManager, "signature")
     }
 
 
-    fun run(url: String) {
+    /** Fetches data from database and parses JSON into strings for futher use **/
+
+    private fun run(url: String) {
         Log.d("dbg", "fetch started")
         val request = Request.Builder()
             .url(url)
@@ -383,39 +328,15 @@ class MainActivity : AppCompatActivity() {
                     Log.d("model", "$model")
 
                 }
-
                 testeri = arrayList_details[0].name
-                runOnUiThread {
-
-                    //stuff that updates ui
-                    val obj_adapter: CustomAdapter
-                    obj_adapter = CustomAdapter(applicationContext, arrayList_details)
-                    //listView_details.adapter=obj_adapter
-
-                    Log.d("json", " in uiThread $arrayList_details")
-
-                    Log.d("model", arrayList_details[0].name)
-
-
-                    //val myTextView2 = findViewById<TextView>(R.id.textView2)
-
-                    //val textView: TextView = findViewById<TextView>(R.id.basicInfoCard)
-                    //textView.text = "arrayList_details[0].name"
-
-
-                    Log.d("json", "UIThread finished")
-
-
-                }
-
             }
         })
     }
+
+    /** Network check **/
 
     private fun networkOk(): Boolean {
         val connService = this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return connService.activeNetworkInfo?.isConnected ?: false
     }
-
-
 }
