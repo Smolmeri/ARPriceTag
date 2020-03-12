@@ -43,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     private var hardHatRenderable: ModelRenderable? = null
     private var skiBootRenderable: ModelRenderable? = null
     private lateinit var productNameRenderable: ViewRenderable
-    private lateinit var productNameRenderableSkiboot: ViewRenderable
     private lateinit var sneakerInfoRenderable: ViewRenderable
     private lateinit var skibootInfoRenderable: ViewRenderable
     private lateinit var hardhatInfoRenderable: ViewRenderable

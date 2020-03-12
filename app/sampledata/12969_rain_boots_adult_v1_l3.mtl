@@ -1,0 +1,78 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 06.01.2012 12:05:19
+
+newmtl rain_boots___adult_detail_1
+	Ns 40.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.1961 0.2941 0.1922
+	Kd 0.1961 0.2941 0.1922
+	Ks 0.5400 0.5400 0.5400
+	Ke 0.0000 0.0000 0.0000
+
+newmtl rain_boots___adult_detail_3
+	Ns 40.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5647 0.5647 0.5647
+	Kd 0.5647 0.5647 0.5647
+	Ks 0.4500 0.4500 0.4500
+	Ke 0.0000 0.0000 0.0000
+
+newmtl rain_boots___adult_detail_2
+	Ns 40.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.1961 0.2941 0.1922
+	Kd 0.1961 0.2941 0.1922
+	Ks 0.5400 0.5400 0.5400
+	Ke 0.0000 0.0000 0.0000
+
+newmtl rain_boots___adult_body_2
+	Ns 30.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.9333 0.9176 0.8745
+	Kd 0.9333 0.9176 0.8745
+	Ks 0.4500 0.4500 0.4500
+	Ke 0.0000 0.0000 0.0000
+
+newmtl rain_boots___adult_logo
+	Ns 40.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.5400 0.5400 0.5400
+	Ke 0.0000 0.0000 0.0000
+	map_Ka rain_boots - adult_logo.jpg
+	map_Kd rain_boots - adult_logo.jpg
+	map_bump rain_boots - adult_logo_bump.jpg
+	bump rain_boots - adult_logo_bump.jpg
+
+newmtl rain_boots___adult_body
+	Ns 40.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.1961 0.2941 0.1922
+	Kd 0.1961 0.2941 0.1922
+	Ks 0.5400 0.5400 0.5400
+	Ke 0.0000 0.0000 0.0000
