@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
     var a = 0
-    var b = 0
-    var c = 0
+    var b = 1
+    var c = 2
     lateinit var view: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,31 +141,8 @@ class MainActivity : AppCompatActivity() {
 
     /** Loop through color options and change renderables color atribute using rgb values from list **/
 
-    private fun changeColor(node: TransformableNode) {
-        var colorList = mutableListOf<Float>(
-            0.0f,
-            0.0f,
-            0.0f,
-            255.0f,
-            0.0f,
-            0.0f,
-            0.0f,
-            255.0f,
-            0.0f,
-            0.0f,
-            0.0f,
-            255.0f,
-            255.0f,
-            255.0f,
-            0.0f,
-            255.0f,
-            0.0f,
-            255.0f,
-            255.0f,
-            255.0f,
-            255.0f
-        )
-
+    private fun changeColor(node: TransformableNode){
+        var colorList = mutableListOf(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
         if (node != null) {
             node.renderable?.material?.setFloat3(
                 "baseColorTint",
@@ -176,13 +153,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         /** Create counter to change color each time user clicks on button **/
-        if (a < colorList.size) {
+
+        if (a < colorList.size - 3) {
             try {
-                a += 1
-                b += 1
-                c += 1
-            } catch (e: IOException) {
-                Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
+                Log.d("check", "went in to try")
+                a += 3
+                b += 3
+                c += 3
+            } catch (e: IOException)
+            {
+                Log.d("check", "went in to catch")
+               Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
             }
         } else {
             Toast.makeText(this, "No more colors", Toast.LENGTH_LONG).show()
@@ -253,21 +234,9 @@ class MainActivity : AppCompatActivity() {
                             sneakerNode.setParent(anchorNode)
                             sneakerInfoNode.setParent(sneakerNode)
 
-                            sneakerNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(1f, 0f, 0f),
-                                    -180f
-                                )
-                            )
-                            sneakerInfoNode.setLocalRotation(
-                                Quaternion.axisAngle(
-                                    Vector3(
-                                        1f,
-                                        0f,
-                                        0f
-                                    ), 90f
-                                )
-                            )
+                            Log.d("aa", "1st")
+                            sneakerNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 180f))
+                            sneakerInfoNode.setLocalRotation(Quaternion.axisAngle(Vector3(1f, 0f, 0f), 90f))
 
                             sneakerNode.renderable = sneakerRenderable
                             sneakerInfoNode.renderable = sneakerInfoRenderable
@@ -404,16 +373,6 @@ class MainActivity : AppCompatActivity() {
                     var list = str.split(reg)
                     var finalTag: String = "#" + list[1] + " #" + list[3] + " #" + list[5]
                     model.tags = finalTag
-
-
-
-
-
-
-
-
-
-
 
                     arrayList_details.add(model)
 
