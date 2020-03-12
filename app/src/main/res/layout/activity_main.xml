@@ -20,6 +20,33 @@
         android:src="@drawable/fit_to_scan"
         android:contentDescription="hees" />
 
-    </FrameLayout>
+    <TextView
+        android:id="@+id/textView123"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:background="@color/primaryLightColor"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:background="@drawable/roundedbutton"
+            android:text="@string/deleteBtn" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:background="@drawable/roundedbutton"
+            android:text="@string/changeColorBtn" />
+    </LinearLayout>
+
+</FrameLayout>
 
 
