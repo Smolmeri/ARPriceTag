@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     private val url = "http://users.metropolia.fi/~tuomamp/arData.json"
     var a = 0
-    var b = 0
-    var c = 0
+    var b = 1
+    var c = 2
     lateinit var view: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,19 +142,19 @@ class MainActivity : AppCompatActivity() {
     /** Loop through color options and change renderables color atribute using rgb values from list **/
 
     private fun changeColor(node: TransformableNode){
-        var colorList = mutableListOf<Float>(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 0.0f, 255.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
-
+        var colorList = mutableListOf(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
         if (node != null) {
             node.renderable?.material?.setFloat3("baseColorTint", colorList[a], colorList[b], colorList[c])
         }
 
         /** Create counter to change color each time user clicks on button **/
-        if (a < colorList.size) {
+
+        if (a < colorList.size - 3) {
             try {
                 Log.d("check", "went in to try")
-                a += 1
-                b += 1
-                c += 1
+                a += 3
+                b += 3
+                c += 3
             } catch (e: IOException)
             {
                 Log.d("check", "went in to catch")
