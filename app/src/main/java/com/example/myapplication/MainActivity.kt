@@ -1,33 +1,19 @@
 package com.example.myapplication
 
 import android.content.Context
-import android.content.DialogInterface
-import android.graphics.BitmapFactory
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.service.vr.VrListenerService
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
-import android.widget.Button
-import android.net.ConnectivityManager
-import android.net.Uri
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.ar.core.AugmentedImage
 import com.google.ar.core.TrackingState
 import com.google.ar.sceneform.AnchorNode
-import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
 import com.google.ar.sceneform.rendering.ModelRenderable
@@ -114,7 +100,6 @@ class MainActivity : AppCompatActivity() {
             .build()
             .thenAccept { renderable -> sneakerInfoRenderable = renderable }
 
-        modelIndex = 0
         ViewRenderable.builder()
             .setView(this, view)
             .build()
@@ -139,12 +124,11 @@ class MainActivity : AppCompatActivity() {
 
                 }
             }
-        } else Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG )
+        } else {Toast.makeText(this, "Connect to the internet before continuing", Toast.LENGTH_LONG )}
 
             }
-        }
 
-    }
+
 
      /** Helper function to remove current nodes from scene **/
 
@@ -161,7 +145,7 @@ class MainActivity : AppCompatActivity() {
         var colorList = mutableListOf<Float>(0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 0.0f, 0.0f, 0.0f, 255.0f, 255.0f, 255.0f, 0.0f, 255.0f, 0.0f, 255.0f, 255.0f, 255.0f, 255.0f)
 
         if (node != null) {
-            node.renderable?.material?.setFloat3("baseColorTint", colorList[a.inc()], colorList[b.inc()], colorList[c.inc()])
+            node.renderable?.material?.setFloat3("baseColorTint", colorList[a], colorList[b], colorList[c])
         }
 
         /** Create counter to change color each time user clicks on button **/
