@@ -62,6 +62,8 @@ MIT
 
  - TX00CK66-3007
 
+ - [Oskari Sieranen] and [Jari Pietikäinen]
+
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
 
 
@@ -70,4 +72,6 @@ MIT
    [love]: <https://www.youtube.com/watch?v=dsxtImDVMig>
    [GitHub repo]: <https://github.com/Smolmeri/ARPriceTag>
    [Tom Paavolainen]: <https://github.com/Smolmeri>
-   [Otto Söderlund]: https://github.com/ottosoderlund>
+   [Otto Söderlund]: <https://github.com/ottosoderlund>
+   [Jari Pietikäinen]: <https://github.com/J4R1>
+   [Oskari Sieranen]: <https://github.com/oskarits>
