@@ -2,7 +2,7 @@
 
 [![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
 
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+[![Build Status](https://travis-ci.com/Smolmeri/ARPriceTag.svg?branch=master)](https://travis-ci.com/github/Smolmeri/ARPriceTag)
 
 ShoppAR is an online shopping tool that aims to reduce online shopping returns by providing the user with a 3D rendering of the product they are about to purchase.
 
